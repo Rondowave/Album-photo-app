@@ -1,24 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import UsersOverview from './components/UsersOverview';
+import UserAlbums from './components/UserAlbums';
+import AlbumPhotos from './components/AlbumPhotos';
+import LanguageSelector from './components/LanguageSelector';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const client = new ApolloClient({
+  uri: 'http://localhost:4000/',
+  cache: new InMemoryCache(),
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ApolloProvider client={client}>
+      <Router>
+        <div className="App">
+          <LanguageSelector />
+          <Routes>
+            <Route path="/" element={<UsersOverview />} />
+            <Route path="/user-albums/:userId" element={<UserAlbums />} />
+            <Route path="/album-photos/:albumId" element={<AlbumPhotos />} />
+          </Routes>
+        </div>
+      </Router>
+    </ApolloProvider>
   );
 }
 
