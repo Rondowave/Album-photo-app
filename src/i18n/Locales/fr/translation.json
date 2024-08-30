@@ -1,0 +1,18 @@
+{
+  "loading": "Chargement...",
+  "error": "Erreur",
+  "users_overview": "Aperçu des utilisateurs",
+  "albums": "Albums",
+  "add_album": "Ajouter un album",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "total_photos": "Total Photos",
+  "edit_album": "Modifier l'album",
+  "album_title": "Titre de l'album",
+  "enter_album_title": "Entrez le titre de l'album",
+  "close": "Fermer",
+  "save_changes": "Enregistrer les modifications",
+  "no_album_found": "Aucun album trouvé.",
+  "back_to_albums": "Retour aux albums",
+  "back_to_users": "Retour aux utilisateurs"
+}

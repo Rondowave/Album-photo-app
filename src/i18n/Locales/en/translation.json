@@ -1,0 +1,18 @@
+{
+  "loading": "Loading...",
+  "error": "Error",
+  "users_overview": "Users Overview",
+  "albums": "Albums",
+  "add_album": "Add Album",
+  "edit": "Edit",
+  "delete": "Delete",
+  "total_photos": "Total Photo count",
+  "edit_album": "Edit Album",
+  "album_title": "Album Title",
+  "enter_album_title": "Enter album title",
+  "close": "Close",
+  "save_changes": "Save Changes",
+  "no_album_found": "No album found.",
+  "back_to_albums": "Back to Albums",
+  "back_to_users": "Back to Users"
+}
