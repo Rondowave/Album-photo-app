@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Dropdown } from 'react-bootstrap';
 
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
@@ -9,10 +10,16 @@ const LanguageSelector = () => {
   };
 
   return (
-    <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
-      <button onClick={() => changeLanguage('en')} className="btn btn-link">English</button>
-      <button onClick={() => changeLanguage('fr')} className="btn btn-link">Français</button>
-    </div>
+    <Dropdown>
+      <Dropdown.Toggle variant="light" id="dropdown-language">
+        {i18n.language === 'en' ? 'English' : 'Français'}
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <Dropdown.Item onClick={() => changeLanguage('en')}>English</Dropdown.Item>
+        <Dropdown.Item onClick={() => changeLanguage('fr')}>Français</Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 };
 

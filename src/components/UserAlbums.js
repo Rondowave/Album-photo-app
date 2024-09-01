@@ -1,30 +1,27 @@
-// This component is responsible for managing and displaying the albums of a specific user.
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { Card, Row, Col, Button, Pagination, Form, Modal } from 'react-bootstrap';
+import { Card, Button, Pagination, Form, Modal } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-// GraphQL query to fetch the albums of a specific user by userId
+// GraphQL query to fetch user albums
 const GET_USER_ALBUMS = gql`
   query GetUserAlbums($userId: ID!) {
     user(id: $userId) {
+      id
       name
       albums {
         id
         title
         photos {
           id
-          title
-          url
         }
       }
     }
   }
 `;
 
-// GraphQL mutation to add a new album for the user
+// GraphQL mutation to add a new album
 const ADD_ALBUM = gql`
   mutation AddAlbum($userId: ID!, $title: String!) {
     addAlbum(userId: $userId, title: $title) {
@@ -35,150 +32,131 @@ const ADD_ALBUM = gql`
   }
 `;
 
-// GraphQL mutation to edit the title of an existing album
+// GraphQL mutation to edit an existing album
 const EDIT_ALBUM = gql`
-  mutation EditAlbum($albumId: ID!, $title: String!, $userId: ID!) {
-    editAlbum(id: $albumId, title: $title, userId: $userId) {
+  mutation EditAlbum($id: ID!, $title: String!, $userId: ID!) {
+    editAlbum(id: $id, title: $title, userId: $userId) {
       id
       title
-      userId
     }
   }
 `;
 
-// GraphQL mutation to delete an album by its ID
+// GraphQL mutation to delete an album
 const DELETE_ALBUM = gql`
-  mutation DeleteAlbum($albumId: ID!, $userId: ID!) {
-    deleteAlbum(id: $albumId, userId: $userId) {
+  mutation DeleteAlbum($id: ID!, $userId: ID!) {
+    deleteAlbum(id: $id, userId: $userId) {
       id
     }
   }
 `;
 
 const UserAlbums = () => {
-  const { userId } = useParams();  // Extracting userId from the URL parameters
-  const { loading, error, data } = useQuery(GET_USER_ALBUMS, {
-    variables: { userId },
-  });
-  const [currentPage, setCurrentPage] = useState(1);  // State to manage the current page for pagination
-  const [showModal, setShowModal] = useState(false);  // State to manage the visibility of the modal
-  const [editAlbumId, setEditAlbumId] = useState(null);  // State to track the album being edited
-  const [albumTitle, setAlbumTitle] = useState('');  // State to manage the album title input
-  const albumsPerPage = 10;  // Number of albums to display per page
-  const { t } = useTranslation();  // Hook for handling translations
+  const { userId } = useParams(); // Get the userId from the URL parameters
+  const { loading, error, data } = useQuery(GET_USER_ALBUMS, { variables: { userId } });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [editAlbumId, setEditAlbumId] = useState(null);
+  const [albumTitle, setAlbumTitle] = useState('');
+  const albumsPerPage = 10;
+  const { t } = useTranslation();
 
-  // Mutation hook to add a new album
   const [addAlbum] = useMutation(ADD_ALBUM, {
     refetchQueries: [{ query: GET_USER_ALBUMS, variables: { userId } }],
   });
 
-  // Mutation hook to edit an existing album
   const [editAlbum] = useMutation(EDIT_ALBUM, {
     refetchQueries: [{ query: GET_USER_ALBUMS, variables: { userId } }],
   });
 
-  // Mutation hook to delete an album
   const [deleteAlbum] = useMutation(DELETE_ALBUM, {
     refetchQueries: [{ query: GET_USER_ALBUMS, variables: { userId } }],
   });
 
-  if (loading) return <p>{t('loading')}</p>;  // Display loading text while fetching data
-  if (error) return <p>{t('error')}: {error.message}</p>;  // Display error message if query fails
+  if (loading) return <p>{t('loading')}</p>;
+  if (error) return <p>{t('error')}: {error.message}</p>;
 
-  const user = data.user;  // Access the user data from the query response
-
-  // Logic for handling pagination
+  const user = data.user;
   const indexOfLastAlbum = currentPage * albumsPerPage;
   const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
   const currentAlbums = user.albums.slice(indexOfFirstAlbum, indexOfLastAlbum);
   const totalPages = Math.ceil(user.albums.length / albumsPerPage);
 
-  const handlePageChange = (pageNumber) => {  // Handle pagination page change
-    setCurrentPage(pageNumber);
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Handle adding a new album
+  const handleAddAlbum = () => {
+    addAlbum({ variables: { userId, title: albumTitle } })
+      .then(() => {
+        setAlbumTitle('');
+        setShowModal(false);
+      })
+      .catch(error => console.error('Error adding album:', error));
   };
 
-  const handleAddAlbum = () => {  // Handle the addition of a new album
-    addAlbum({ variables: { userId, title: albumTitle } });
-    setAlbumTitle('');  // Reset the album title input
-    setShowModal(false);  // Close the modal
+  // Handle editing an existing album
+  const handleEditAlbum = (albumId, title) => {
+    setEditAlbumId(albumId);
+    setAlbumTitle(title);
+    setShowModal(true);
   };
 
-  const handleEditAlbum = (albumId, title) => {  // Open the modal to edit the selected album
-    setEditAlbumId(albumId);  // Set the ID of the album being edited
-    setAlbumTitle(title);  // Set the current title of the album in the input
-    setShowModal(true);  // Show the modal
+  const handleSaveEdit = () => {
+    editAlbum({ variables: { id: editAlbumId, title: albumTitle, userId } })
+      .then(() => {
+        setAlbumTitle('');
+        setEditAlbumId(null);
+        setShowModal(false);
+      })
+      .catch(error => console.error('Error editing album:', error));
   };
 
-  const handleSaveEdit = () => {  // Save the edited album title
-    editAlbum({ variables: { albumId: editAlbumId, title: albumTitle, userId } });
-    setAlbumTitle('');  // Reset the album title input
-    setEditAlbumId(null);  // Clear the edit album ID
-    setShowModal(false);  // Close the modal
-  };
-
-  const handleDeleteAlbum = (albumId) => {  // Handle the deletion of an album
-    deleteAlbum({ variables: { albumId, userId } });
+  // Handle deleting an album
+  const handleDeleteAlbum = (albumId) => {
+    if (window.confirm(t('confirm_delete_album'))) {
+      deleteAlbum({ variables: { id: albumId, userId } })
+        .then(() => console.log('Album deleted successfully'))
+        .catch(error => console.error('Error deleting album:', error));
+    }
   };
 
   return (
     <div className="user-albums">
-      <h2 className="text-center">{user.name}'s {t('albums')}</h2>
-      <Button variant="success" onClick={() => setShowModal(true)}>{t('add_album')}</Button>
-      <Row>
+      <h2 className="text-center mb-4">{user.name}'s {t('albums')}</h2>
+      <Button variant="success" className="mb-3" onClick={() => setShowModal(true)}>{t('add_album')}</Button>
+      <div className="card-container">
         {currentAlbums.map((album) => (
-          <Col xs={12} sm={6} md={4} lg={2} key={album.id} className="mb-4">
-            <Card className="album-card">
-              <Card.Body>
-                <Card.Title>
-                  <Link 
-                    to={`/album-photos/${album.id}`} 
-                    className="text-decoration-none"
-                    onClick={(e) => {
-                      if (e.target.tagName.toLowerCase() === 'button') {
-                        e.preventDefault();  // Prevent navigation if a button is clicked
-                      }
-                    }}
-                  >
-                    {album.title}
-                  </Link>
-                </Card.Title>
-                <Card.Text>{t('total_photos')}: {album.photos.length}</Card.Text>
-                <Button 
-                  variant="primary" 
-                  onClick={(e) => {
-                    e.stopPropagation();  // Stop event propagation to prevent navigation
-                    handleEditAlbum(album.id, album.title);  // Handle the edit action
-                  }}
-                >
-                  {t('edit')}
-                </Button>
-                <Button 
-                  variant="danger" 
-                  onClick={(e) => {
-                    e.stopPropagation();  // Stop event propagation to prevent navigation
-                    handleDeleteAlbum(album.id);  // Handle the delete action
-                  }}
-                >
-                  {t('delete')}
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
+          <Card key={album.id}>
+            <Card.Body>
+              <Card.Title>
+                <Link to={`/album-photos/${album.id}`} className="text-decoration-none">
+                  {album.title}
+                </Link>
+              </Card.Title>
+              <Card.Text>{t('total_photos')}: {album.photos.length}</Card.Text>
+              <Button variant="primary" size="sm" className="me-2" onClick={() => handleEditAlbum(album.id, album.title)}>
+                {t('edit')}
+              </Button>
+              <Button variant="danger" size="sm" onClick={() => handleDeleteAlbum(album.id)}>
+                {t('delete')}
+              </Button>
+            </Card.Body>
+          </Card>
         ))}
-      </Row>
-      <Pagination>
+      </div>
+      <Pagination className="justify-content-center mt-4">
         {[...Array(totalPages).keys()].map((number) => (
           <Pagination.Item
             key={number + 1}
             active={number + 1 === currentPage}
-            onClick={() => handlePageChange(number + 1)}  // Change the current page
+            onClick={() => handlePageChange(number + 1)}
           >
             {number + 1}
           </Pagination.Item>
         ))}
       </Pagination>
-      <Button variant="primary" as={Link} to="/">
-        {t('back_to_users')}  // Link back to the Users Overview
+      <Button variant="primary" as={Link} to="/" className="mt-3">
+        {t('back_to_users')}
       </Button>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -193,7 +171,7 @@ const UserAlbums = () => {
                 type="text"
                 placeholder={t('enter_album_title')}
                 value={albumTitle}
-                onChange={(e) => setAlbumTitle(e.target.value)}  // Handle title input change
+                onChange={(e) => setAlbumTitle(e.target.value)}
               />
             </Form.Group>
           </Form>
@@ -203,7 +181,7 @@ const UserAlbums = () => {
             {t('close')}
           </Button>
           <Button variant="primary" onClick={editAlbumId ? handleSaveEdit : handleAddAlbum}>
-            {t('save_changes')}  // Save the changes or add the album
+            {t('save_changes')}
           </Button>
         </Modal.Footer>
       </Modal>

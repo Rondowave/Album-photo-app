@@ -14,5 +14,6 @@
   "save_changes": "Enregistrer les modifications",
   "no_album_found": "Aucun album trouvé.",
   "back_to_albums": "Retour aux albums",
-  "back_to_users": "Retour aux utilisateurs"
+  "back_to_users": "Retour aux utilisateurs",
+  "home": "Accueil"  
 }

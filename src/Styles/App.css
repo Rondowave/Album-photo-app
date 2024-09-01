@@ -1,44 +1,70 @@
-/* Conteneur pour les cartes */
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 10px;
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+}
 
 .card {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    width: unset; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    text-decoration: none;
-    color: black;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s;
 }
 
 .card:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-5px);
+  transform: translateY(-5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
 }
 
 .pagination {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
-.pagination button {
-    margin: 0 5px;
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    background-color: white;
-    cursor: pointer;
+.navbar {
+  background-color: #007bff;
+  padding: 10px 0;
 }
 
-.pagination button:hover {
-    background-color: #ddd;
+.navbar-brand {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-link {
+  color: white;
+}
+
+.language-selector {
+  margin-left: auto;
 }

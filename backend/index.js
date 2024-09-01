@@ -1,10 +1,12 @@
 const { ApolloServer, gql } = require('apollo-server');
 const fs = require('fs');
 
+// Load data from JSON files
 const users = JSON.parse(fs.readFileSync('users.json', 'utf-8'));
 const albums = JSON.parse(fs.readFileSync('albums.json', 'utf-8'));
 const photos = JSON.parse(fs.readFileSync('photos.json', 'utf-8'));
 
+// GraphQL schema definition
 const typeDefs = gql`
   type User {
     id: ID!
@@ -69,17 +71,25 @@ const typeDefs = gql`
   }
 `;
 
+// GraphQL resolvers
 const resolvers = {
   Query: {
+    // Resolver to get all users
     users: () => users,
+    // Resolver to get a specific user by ID
     user: (parent, args) => users.find(user => user.id === parseInt(args.id)),
+    // Resolver to get all albums for a specific user
     albums: (parent, args) => albums.filter(album => album.userId === parseInt(args.userId)),
+    // Resolver to get a specific album by ID
     album: (parent, args) => albums.find(album => album.id === parseInt(args.id)),
+    // Resolver to get all photos for a specific album
     photos: (parent, args) => photos.filter(photo => photo.albumId === parseInt(args.albumId)),
+    // Resolver to get a specific photo by ID
     photo: (parent, args) => photos.find(photo => photo.id === parseInt(args.id)),
   },
 
   Mutation: {
+    // Mutation to add a new album
     addAlbum: (parent, args) => {
       const newAlbum = {
         id: String(albums.length + 1),
@@ -90,6 +100,8 @@ const resolvers = {
       albums.push(newAlbum);
       return newAlbum;
     },
+
+    // Mutation to edit an existing album
     editAlbum: (parent, args) => {
       const album = albums.find(album => album.id === parseInt(args.id) && album.userId === parseInt(args.userId));
       if (album) {
@@ -97,6 +109,8 @@ const resolvers = {
       }
       return album;
     },
+
+    // Mutation to delete an album
     deleteAlbum: (parent, args) => {
       const albumIndex = albums.findIndex(album => album.id === parseInt(args.id) && album.userId === parseInt(args.userId));
       if (albumIndex !== -1) {
@@ -105,6 +119,8 @@ const resolvers = {
       }
       return null;
     },
+
+    // Mutation to delete a photo
     deletePhoto: (parent, args) => {
       const photoIndex = photos.findIndex(photo => photo.id === parseInt(args.id));
       if (photoIndex !== -1) {
@@ -115,15 +131,18 @@ const resolvers = {
     }
   },
 
+  // Resolver for User type to get albums associated with a user
   User: {
     albums: (parent) => albums.filter(album => album.userId === parent.id),
   },
 
+  // Resolver for Album type to get photos associated with an album
   Album: {
     photos: (parent) => photos.filter(photo => photo.albumId === parent.id),
   }
 };
 
+// Start the Apollo Server
 const server = new ApolloServer({ typeDefs, resolvers });
 
 server.listen().then(({ url }) => {
