@@ -93,3 +93,12 @@ body {
     grid-template-columns: 1fr; /* 1 card per row */
   }
 }
+.card-container a {
+  text-decoration: none;
+  color: inherit; /* Pour garder la couleur originale */
+}
+
+.card-container a:hover {
+  text-decoration: none;
+  color: inherit; /* Pour garder la couleur originale au survol */
+}
