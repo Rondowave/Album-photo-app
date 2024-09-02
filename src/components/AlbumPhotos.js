@@ -73,7 +73,16 @@ const AlbumPhotos = () => {
         ))}
       </div>
       <Pagination className="justify-content-center mt-4">
-        {[...Array(totalPages).keys()].map((number) => (
+        <Pagination.Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          {t('previous')}
+        </Pagination.Prev>
+        {[...Array(totalPages).keys()].slice(
+          Math.max(0, currentPage - 3),
+          Math.min(currentPage + 2, totalPages)
+        ).map((number) => (
           <Pagination.Item
             key={number + 1}
             active={number + 1 === currentPage}
@@ -82,6 +91,12 @@ const AlbumPhotos = () => {
             {number + 1}
           </Pagination.Item>
         ))}
+        <Pagination.Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          {t('next')}
+        </Pagination.Next>
       </Pagination>
       <Button variant="primary" as={Link} to={`/user-albums/${album.userId}`} className="mt-3">
         {t('back_to_albums')}

@@ -4,7 +4,6 @@ import { Card, Pagination } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-// GraphQL query to fetch all users
 const GET_USERS = gql`
   query GetUsers {
     users {
@@ -16,9 +15,9 @@ const GET_USERS = gql`
 `;
 
 const UsersOverview = () => {
-  const { loading, error, data } = useQuery(GET_USERS); // Execute the query to fetch users
+  const { loading, error, data } = useQuery(GET_USERS);
   const [currentPage, setCurrentPage] = useState(1);
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
   const usersPerPage = 10;
 
   if (loading) return <p>{t('loading')}</p>;
@@ -30,7 +29,6 @@ const UsersOverview = () => {
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(users.length / usersPerPage);
 
-  // Handle pagination changes
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   return (

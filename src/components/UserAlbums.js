@@ -4,7 +4,6 @@ import { useQuery, useMutation, gql } from '@apollo/client';
 import { Card, Button, Pagination, Form, Modal } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-// GraphQL query to fetch user albums
 const GET_USER_ALBUMS = gql`
   query GetUserAlbums($userId: ID!) {
     user(id: $userId) {
@@ -21,7 +20,6 @@ const GET_USER_ALBUMS = gql`
   }
 `;
 
-// GraphQL mutation to add a new album
 const ADD_ALBUM = gql`
   mutation AddAlbum($userId: ID!, $title: String!) {
     addAlbum(userId: $userId, title: $title) {
@@ -32,7 +30,6 @@ const ADD_ALBUM = gql`
   }
 `;
 
-// GraphQL mutation to edit an existing album
 const EDIT_ALBUM = gql`
   mutation EditAlbum($id: ID!, $title: String!, $userId: ID!) {
     editAlbum(id: $id, title: $title, userId: $userId) {
@@ -42,17 +39,16 @@ const EDIT_ALBUM = gql`
   }
 `;
 
-// GraphQL mutation to delete an album
 const DELETE_ALBUM = gql`
-  mutation DeleteAlbum($id: ID!, $userId: ID!) {
-    deleteAlbum(id: $id, userId: $userId) {
+  mutation DeleteAlbum($id: ID!) {
+    deleteAlbum(id: $id) {
       id
     }
   }
 `;
 
 const UserAlbums = () => {
-  const { userId } = useParams(); // Get the userId from the URL parameters
+  const { userId } = useParams();
   const { loading, error, data } = useQuery(GET_USER_ALBUMS, { variables: { userId } });
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -84,7 +80,6 @@ const UserAlbums = () => {
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Handle adding a new album
   const handleAddAlbum = () => {
     addAlbum({ variables: { userId, title: albumTitle } })
       .then(() => {
@@ -94,7 +89,6 @@ const UserAlbums = () => {
       .catch(error => console.error('Error adding album:', error));
   };
 
-  // Handle editing an existing album
   const handleEditAlbum = (albumId, title) => {
     setEditAlbumId(albumId);
     setAlbumTitle(title);
@@ -111,10 +105,9 @@ const UserAlbums = () => {
       .catch(error => console.error('Error editing album:', error));
   };
 
-  // Handle deleting an album
   const handleDeleteAlbum = (albumId) => {
     if (window.confirm(t('confirm_delete_album'))) {
-      deleteAlbum({ variables: { id: albumId, userId } })
+      deleteAlbum({ variables: { id: albumId } })
         .then(() => console.log('Album deleted successfully'))
         .catch(error => console.error('Error deleting album:', error));
     }

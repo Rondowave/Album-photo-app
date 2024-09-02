@@ -66,7 +66,7 @@ const typeDefs = gql`
   type Mutation {
     addAlbum(userId: ID!, title: String!): Album
     editAlbum(id: ID!, title: String!, userId: ID!): Album
-    deleteAlbum(id: ID!, userId: ID!): Album
+    deleteAlbum(id: ID!): Album
     deletePhoto(id: ID!): Photo
   }
 `;
@@ -112,7 +112,7 @@ const resolvers = {
 
     // Mutation to delete an album
     deleteAlbum: (parent, args) => {
-      const albumIndex = albums.findIndex(album => album.id === parseInt(args.id) && album.userId === parseInt(args.userId));
+      const albumIndex = albums.findIndex(album => album.id === parseInt(args.id));
       if (albumIndex !== -1) {
         const deletedAlbum = albums.splice(albumIndex, 1);
         return deletedAlbum[0];
